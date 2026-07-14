@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+arc.jsonl
+regret.jsonl
+state.json
+memory_long.txt
+memory_short.txt
+last_result.json
+cmd.json
+*.bak
+__pycache__/
+*.pyc
+.env

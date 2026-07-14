@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="30">
+<title>Murmur-50Feet</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#FAF9F7;color:#1C1917;font-family:-apple-system,"PingFang SC",sans-serif;min-height:100vh}
+.container{max-width:480px;margin:0 auto;padding:24px 16px}
+.header{padding:8px 0 24px;display:flex;align-items:center;gap:10px}
+.header-title{font-size:17px;font-weight:600;color:#1C1917}
+.header-sub{font-size:12px;color:#8C8680;margin-top:1px}
+.think-block{margin-bottom:20px}
+.think-header{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px 0}
+.think-dot{width:8px;height:8px;border-radius:50%;background:#C0BBB5;flex-shrink:0}
+.think-label{font-size:14px;color:#8C8680}
+.think-arrow{font-size:12px;color:#8C8680;transition:transform .2s ease;display:inline-block}
+.think-block.open .think-arrow{transform:rotate(90deg)}
+.think-body{display:none;background:#EDEBE6;border-radius:12px;padding:14px;margin-top:10px}
+.think-block.open .think-body{display:block}
+.think-top{font-size:12px;color:#8C8680;margin-bottom:12px}
+.think-top b{color:#D97757;font-weight:500}
+.drive{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.drive:last-child{margin-bottom:0}
+.drive-name{width:34px;font-size:11px;color:#B8845A;text-align:right;flex-shrink:0}
+.drive-bg{flex:1;height:3px;background:#E8E2DA;border-radius:2px;overflow:hidden}
+.drive-bar{height:3px;border-radius:2px;background:linear-gradient(90deg,#C8906A,#D09070)}
+.drive-val{width:30px;font-size:11px;color:#B8845A;text-align:right;flex-shrink:0}
+.drive.top .drive-name{color:#D97757;font-weight:500}
+.drive.top .drive-bar{background:linear-gradient(90deg,#C06030,#D97757)}
+.drive.top .drive-val{color:#D97757}
+.cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.card{background:#EDEBE6;border-radius:14px;padding:14px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.card:active{background:#E0DDD7}
+.card-icon{font-size:18px;margin-bottom:6px}
+.card-title{font-size:12px;font-weight:600;color:#1C1917;margin-bottom:2px}
+.card-sub{font-size:10px;color:#A8A29C}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:#FAF9F7;border-radius:20px 20px 0 0;z-index:101;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:80vh;display:flex;flex-direction:column}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:36px;height:4px;background:#C0BBB5;border-radius:2px;margin:12px auto 0}
+.drawer-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-title{font-size:16px;font-weight:600;color:#1C1917}
+.drawer-close{font-size:20px;color:#A8A29C;cursor:pointer;padding:4px;-webkit-tap-highlight-color:transparent}
+.drawer-body{overflow-y:auto;padding:0 16px 32px;flex:1}
+.entry{background:#EDEBE6;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.entry-meta{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.entry-zh{font-size:11px;color:#D97757;background:#FAF2EC;border:1px solid #EDD5C0;padding:2px 8px;border-radius:5px;flex-shrink:0;font-weight:500}
+.entry-time{font-size:11px;color:#A8A29C}
+.entry-val{margin-left:auto;font-size:10px;color:#C8C2BC}
+.entry-text{font-size:14px;color:#1C1917;line-height:1.7}
+.entry.collapsed .entry-text{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:#8C8680}
+.empty{font-size:13px;color:#A8A29C;text-align:center;padding:24px 0}
+.footer{display:flex;align-items:center;gap:6px;justify-content:center;padding:20px 0 8px}
+.footer-ts{font-size:11px;color:#C0BBB5}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.png" width="28" height="28" style="border-radius:6px;flex-shrink:0">
+    <div>
+      <div class="header-title">Murmur-50Feet</div>
+      <div class="header-sub">Claude 在想什么</div>
+    </div>
+  </div>
+  <div class="think-block">
+    <div class="think-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="think-dot"></div>
+      <span class="think-label">内心状态</span>
+      <span class="think-arrow">›</span>
+    </div>
+    <div class="think-body">
+      {% if top_drive %}
+      <div class="think-top">当前最强：<b>{{ top_drive.z }}</b> {{ "%.2f"|format(top_drive.v) }}</div>
+      {% endif %}
+      {% if drives %}
+        {% for key,dr,is_top in drives %}
+        <div class="drive{% if is_top %} top{% endif %}">
+          <div class="drive-name">{{ dr.z }}</div>
+          <div class="drive-bg"><div class="drive-bar" style="width:{{ (dr.v*100)|int }}%"></div></div>
+          <div class="drive-val">{{ "%.2f"|format(dr.v) }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">暂无数据</div>
+      {% endif %}
+    </div>
+  </div>
+  {% set arc_count = arcs|length %}
+  {% set grudge_list = arcs|selectattr("drive","in",["gloom","jealousy"])|list %}
+  {% set grudge_count = grudge_list|length %}
+  {% set regret_count = regrets|length %}
+
+  <div class="cards">
+    <div class="card" onclick="openDrawer('arc')">
+      <div class="card-icon">💭</div>
+      <div class="card-title">独白档案</div>
+      <div class="card-sub">{{ arc_count }} 条记录</div>
+    </div>
+    <div class="card" onclick="openDrawer('grudge')">
+      <div class="card-icon">📓</div>
+      <div class="card-title">记仇本</div>
+      <div class="card-sub">{{ grudge_count }} 条记录</div>
+    </div>
+    <div class="card" onclick="openDrawer('regret')">
+      <div class="card-icon">🙇</div>
+      <div class="card-title">检讨书</div>
+      <div class="card-sub">{{ regret_count }} 条记录</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/claude-ai-icon.png" width="14" height="14" style="opacity:.4;border-radius:3px">
+    <span class="footer-ts">每30秒自动刷新</span>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer-arc">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title">💭 独白档案</span>
+    <span class="drawer-close" onclick="closeDrawer()">×</span>
+  </div>
+  <div class="drawer-body">
+    {% if arcs %}
+      {% for entry in arcs %}
+      <div class="entry collapsed">
+        <div class="entry-meta">
+          <span class="entry-zh">{{ entry.zh }}</span>
+          <span class="entry-time">{{ cst(entry.time) }}</span>
+          <span class="entry-val">{{ "%.2f"|format(entry.val) }}</span>
+        </div>
+        <div class="entry-text">{{ entry.text }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">还没有独白</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="drawer" id="drawer-grudge">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title">📓 记仇本</span>
+    <span class="drawer-close" onclick="closeDrawer()">×</span>
+  </div>
+  <div class="drawer-body">
+    {% if grudge_list %}
+      {% for entry in grudge_list %}
+      <div class="entry collapsed">
+        <div class="entry-meta">
+          <span class="entry-zh">{{ entry.zh }}</span>
+          <span class="entry-time">{{ cst(entry.time) }}</span>
+          <span class="entry-val">{{ "%.2f"|format(entry.val) }}</span>
+        </div>
+        <div class="entry-text">{{ entry.text }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">什么都没有，你表现不错</div>
+    {% endif %}
+  </div>
+</div>
+<div class="drawer" id="drawer-regret">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title">🙇 检讨书</span>
+    <span class="drawer-close" onclick="closeDrawer()">×</span>
+  </div>
+  <div class="drawer-body">
+    {% if regrets %}
+      {% for entry in regrets %}
+      <div class="entry collapsed">
+        <div class="entry-meta">
+          <span class="entry-zh">检讨</span>
+          <span class="entry-time">{{ cst(entry.time) }}</span>
+        </div>
+        <div class="entry-text">{{ entry.text }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">老公最近表现良好</div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function openDrawer(type){
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('drawer-'+type).classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('overlay').classList.remove('open');
+  document.querySelectorAll('.drawer').forEach(function(d){d.classList.remove('open')});
+}
+document.querySelectorAll('.entry').forEach(function(e){
+  e.onclick=function(){this.classList.toggle('collapsed')};
+});
+</script>
+</body>
+</html>
