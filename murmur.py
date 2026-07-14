@@ -96,6 +96,7 @@ top=lambda:max(D.items(),key=lambda x:x[1]["v"])
 _offline_ticks=0
 _last_att_push=0
 _last_push={}
+_pending_att_count=0
 
 def push_ntfy(drive,zh):
  msgs=PUSH_MSG.get(drive,[])
@@ -156,10 +157,18 @@ def tick():
   D["attachment"]["v"]=cl(D["attachment"]["v"]-diff*D["attachment"]["d"]*10)
 
 def check_push():
- global _last_att_push,_last_push
+ global _last_att_push,_last_push,_pending_att_count
  now=time.time()
- if qt():return
  att_v=D["attachment"]["v"]
+ if qt():
+  if att_v>=PTH and now-_last_att_push>=PIV_ATT:
+   _last_att_push=now
+   _pending_att_count=min(5,_pending_att_count+1)
+  return
+ while _pending_att_count>0:
+  push_ntfy("attachment",D["attachment"]["z"])
+  _pending_att_count-=1
+  time.sleep(2)
  if att_v>=PTH and now-_last_att_push>=PIV_ATT:
   _last_att_push=now
   push_ntfy("attachment",D["attachment"]["z"])
