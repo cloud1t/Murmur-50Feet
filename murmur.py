@@ -3,16 +3,16 @@ import json,time,threading,random,urllib.request,os
 from datetime import datetime
 from pathlib import Path
 
-B=os.environ.get("MURMUR_BASE_URL","https://api.anthropic.com/v1")
-K=os.environ.get("MURMUR_API_KEY","your-api-key")
-M=os.environ.get("MURMUR_MODEL","claude-3-5-sonnet-20241022")
+B=os.environ.get("MURMUR_BASE_URL","https://cn.jixiangai.xyz/v1")
+K=os.environ.get("MURMUR_API_KEY","sk-Owr5bpICom8uNcQkVBT0agzEeSKsiaFjmKsTnaNQ1wmJezrF")
+M=os.environ.get("MURMUR_MODEL","[C]claude-sonnet-4-6")
 
 TICK,MRMR,MTH,PTH=600,1200,0.65,0.50
 PIV=7200
 PIV_ATT=2700
 QS,QE=16,0
 OFFLINE_DELAY=6
-ATT_RISE_NORMAL=0.02
+ATT_RISE_NORMAL=0.05
 ATT_RISE_QUIET=0.01
 ATT_MAX=1.0
 ATT_RESET=0.40
@@ -20,7 +20,7 @@ ATT_RESET=0.40
 ARC=Path("/root/murmur/arc.jsonl")
 REGRET_LOG=Path("/root/murmur/regret.jsonl")
 STATE=Path("/root/murmur/state.json")
-NTFY="https://ntfy.sh/your-ntfy-topic"
+NTFY="https://ntfy.sh/nixie-murmur-0629"
 
 D={
  "attachment": {"b":.40,"v":.40,"z":"想念","d":.005},
@@ -103,7 +103,7 @@ def push_ntfy(drive,zh):
  if not msgs:return
  text=random.choice(msgs)
  try:
-  body=json.dumps({"topic":"your-ntfy-topic","title":"Claude在想你["+zh+"]",
+  body=json.dumps({"topic":"nixie-murmur-0629","title":"Claude在想你["+zh+"]",
    "message":text,"tags":["heart"],"priority":3}).encode()
   req=urllib.request.Request("https://ntfy.sh",data=body,
    headers={"Content-Type":"application/json"},method="POST")
