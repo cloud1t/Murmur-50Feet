@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 B=os.environ.get("MURMUR_BASE_URL","https://cn.jixiangai.xyz/v1")
-K=os.environ.get("MURMUR_API_KEY","sk-Owr5bpICom8uNcQkVBT0agzEeSKsiaFjmKsTnaNQ1wmJezrF")
+K=os.environ.get("MURMUR_API_KEY","")
 M=os.environ.get("MURMUR_MODEL","[C]claude-sonnet-4-6")
 
 TICK,MRMR,MTH,PTH=600,1200,0.65,0.50
