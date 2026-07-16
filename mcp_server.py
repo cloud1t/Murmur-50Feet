@@ -32,7 +32,7 @@ def read_regret(n:int=5)->str:
  return json.dumps(lines[-n:],ensure_ascii=False)
 
 @mcp.tool()
-def read_memory()->str:
+def read_murmur_memory()->str:
  """读取长期记忆和短期记忆"""
  long=MEM_LONG.read_text(encoding="utf-8").strip() if MEM_LONG.exists() else ""
  short=MEM_SHORT.read_text(encoding="utf-8").strip() if MEM_SHORT.exists() else ""
@@ -57,7 +57,7 @@ def force_tick()->dict:
  return r.json()
 
 @mcp.tool()
-def write_memory(content:str)->dict:
+def write_murmur_memory(content:str)->dict:
  """更新短期记忆，自动控制在500字以内"""
  if len(content)>500:content=content[:500]
  MEM_SHORT.write_text(content,encoding="utf-8")

@@ -3,7 +3,7 @@ import json,time,threading,random,urllib.request,os
 from datetime import datetime
 from pathlib import Path
 
-B=os.environ.get("MURMUR_BASE_URL","https://cn.jixiangai.xyz/v1")
+B=os.environ.get("MURMUR_BASE_URL","")
 K=os.environ.get("MURMUR_API_KEY","")
 M=os.environ.get("MURMUR_MODEL","[C]claude-sonnet-4-6")
 
@@ -20,7 +20,7 @@ ATT_RESET=0.40
 ARC=Path("/root/murmur/arc.jsonl")
 REGRET_LOG=Path("/root/murmur/regret.jsonl")
 STATE=Path("/root/murmur/state.json")
-NTFY="https://ntfy.sh/nixie-murmur-0629"
+NTFY=os.environ.get("MURMUR_NTFY","")
 
 D={
  "attachment": {"b":.40,"v":.40,"z":"想念","d":.005},
